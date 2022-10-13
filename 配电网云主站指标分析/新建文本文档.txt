@@ -1,0 +1,38 @@
+select Dev_name,
+Dev_label,
+Out_dev_id,
+e.display_value as iot_fac,
+a.display_value as ywlx,
+Rely_id,
+rely_name,
+b.display_value as sblx,
+pd.pd_name as pdname,
+c.display_value as isonline,
+d.display_value as sbzt,
+Direct_id,
+dev.Creat_time,
+fe.name as fename,
+st.name as stname,
+qy.id  as sgs,
+qy.id as xgs,
+qy.id as gds,
+pd.pd_mode as pdmode,
+qy.id as qyid,
+fe.id as feid,
+st.id as stid,
+tq.id as tqid,
+tr.name as trname,
+dev.is_valid,
+dev.connect_mode,
+dev.Is_online
+from d5000.iot_device dev 
+left join (select actual_value,display_value from sys_menu_info where menu_name like 'IOT业务类型') a on dev.Rely_type=a.actual_value
+left join (select actual_value,display_value from sys_menu_info where menu_name like 'IOT设备类型') b on dev.Dev_type=b.actual_value
+left join d5000.iot_product pd on dev.pd_id=pd.id
+left join (select actual_value,display_value from sys_menu_info where menu_name like 'IOT终端工况') c on dev.Is_online=c.actual_value
+left join (select actual_value,display_value from sys_menu_info where menu_name like 'IOT设备状态') d on dev.status=d.actual_value
+left join (select actual_value,display_value from sys_menu_info where menu_name like 'IOT平台厂家') e on dev.Out_iot_fac=e.actual_value
+left join d5000.dms_tr_device tr on tr.id=dev.rely_id 
+left join d5000.dms_feeder_device fe on tr.feeder_id=fe.id 
+left join osp.device_auth_manage auth on fe.id=auth.deviceid 
+left join osp.isc_baseorg qy on qy.id=auth.orgid left join d5000.substation st on fe.st_id=st.id left join d5000.low_voltage_area tq on tr.low_area_id=tq.id  where 1=1 and dev.is_valid=1 and dev.is_online in (1,2)  and dev.connect_mode = 1  and qy.id is not null 
